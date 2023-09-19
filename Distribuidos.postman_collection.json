@@ -1,0 +1,148 @@
+{
+	"info": {
+		"_postman_id": "037f171e-7e3d-45e2-8558-74bda5abcc13",
+		"name": "Distribuidos",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "354982"
+	},
+	"item": [
+		{
+			"name": "Obtener Deudas",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/api/deuda/byUser/:identificacion",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"deuda",
+						"byUser",
+						":identificacion"
+					],
+					"variable": [
+						{
+							"key": "identificacion",
+							"value": "7000001"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "New Request",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/deuda/byUser/:identificacion",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"deuda",
+								"byUser",
+								":identificacion"
+							],
+							"variable": [
+								{
+									"key": "identificacion",
+									"value": "7000001"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 19 Sep 2023 08:01:28 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"nombre\": \"Matthew\",\n    \"apellido\": \"Salinas Meyer\",\n    \"identificacion\": \"7000001\",\n    \"detalle\": [\n        {\n            \"deudaId\": 2,\n            \"montoDeuda\": 672492.08,\n            \"montoPagos\": 0\n        }\n    ]\n}"
+				}
+			]
+		},
+		{
+			"name": "Registrar Deudas",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"identificacion\": \"7000001\",\r\n    \"monto\": \"10000\",\r\n    \"fechaVencimmiento\": \"2024-04-01\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/deuda/",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"deuda",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Registrar Pago",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"deudaId\": 2,\r\n    \"monto\": 100.00\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/pago",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"pago"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
