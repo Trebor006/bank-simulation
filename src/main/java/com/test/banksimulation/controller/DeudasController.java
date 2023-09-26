@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("deuda")
+@RequestMapping("deudas")
 public class DeudasController {
 
   @Autowired

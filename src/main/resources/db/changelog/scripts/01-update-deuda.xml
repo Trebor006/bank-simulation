@@ -5,8 +5,9 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.9.xsd">
 
-    <include file="/db/changelog/scripts/00-create-tables.xml"/>
-    <include file="/db/changelog/scripts/01-update-deuda.xml"/>
+    <changeSet author="Robert Cabrera" id="alter_deuda">
+        <sqlFile path="db/changelog/scripts/db/alterdeuda.sql" />
+    </changeSet>
 
 </databaseChangeLog>
 

@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+
+import com.test.banksimulation.entity.enums.StatusEnum;
 import lombok.*;
 
 @Getter
@@ -26,6 +28,13 @@ public class Deuda {
   @Column(name = "monto_deuda", nullable = false)
   private BigDecimal montoDeuda;
 
+  @Column(name = "saldo", nullable = false)
+  private BigDecimal saldo;
+
   @Column(name = "fecha_vencimiento", nullable = false)
   private Date fechaVencimmiento;
+
+  @Column(name = "status", nullable = false)
+  @Enumerated(EnumType.STRING)
+  private StatusEnum status;
 }

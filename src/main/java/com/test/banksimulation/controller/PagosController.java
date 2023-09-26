@@ -1,8 +1,6 @@
 package com.test.banksimulation.controller;
 
-import com.test.banksimulation.dto.DeudaRequestDto;
 import com.test.banksimulation.dto.PagoDto;
-import com.test.banksimulation.service.DeudaService;
 import com.test.banksimulation.service.PagoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,18 +12,16 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("pago")
+@RequestMapping("pagos")
 public class PagosController {
 
-    @Autowired
-    private PagoService service;
+  @Autowired private PagoService service;
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> registrarPago(@RequestBody PagoDto pagoDto) {
+  @PostMapping
+  public ResponseEntity<Void> registrarPago(@RequestBody PagoDto pagoDto) {
+    log.info("Procesando Pago :" + pagoDto.getDeudaId());
+    service.registrarPago(pagoDto);
 
-        service.registrarPago(pagoDto);
-
-        return ResponseEntity.ok().build();
-    }
+    return ResponseEntity.ok().build();
+  }
 }

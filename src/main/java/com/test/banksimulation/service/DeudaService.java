@@ -4,16 +4,14 @@ import com.test.banksimulation.dto.DetalleDeuda;
 import com.test.banksimulation.dto.DetalleDeudaDto;
 import com.test.banksimulation.dto.DeudaRequestDto;
 import com.test.banksimulation.entity.Deuda;
-import com.test.banksimulation.entity.Pago;
 import com.test.banksimulation.entity.Usuario;
+import com.test.banksimulation.entity.enums.StatusEnum;
 import com.test.banksimulation.repository.DeudaRepository;
 import com.test.banksimulation.repository.PagoRepository;
 import com.test.banksimulation.repository.UsuarioRepository;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import com.test.banksimulation.util.DateUtils;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +36,8 @@ public class DeudaService {
         Deuda.builder()
             .usuario(usuario)
             .montoDeuda(registrarDeuda.getMonto())
+            .saldo(registrarDeuda.getMonto())
+            .status(StatusEnum.PENDING)
             .fechaVencimmiento(DateUtils.toDate(registrarDeuda.getFechaVencimmiento()))
             .build();
     deudaRepository.save(deuda);
@@ -49,36 +49,27 @@ public class DeudaService {
             .findByIdentificacion(identificacion)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-    List<Deuda> deudas = deudaRepository.findAllByUsuarioId(usuario.getId());
-    List<Pago> pagos = pagoRepository.findAllByUsuarioId(usuario.getId());
+    List<Deuda> deudas = deudaRepository.findAllByUsuarioId(usuario.getId(), StatusEnum.PENDING);
 
     return DetalleDeudaDto.builder()
         .identificacion(identificacion)
         .nombre(usuario.getNombre())
         .apellido(usuario.getApellido())
-        .detalle(mapDeudas(deudas, pagos))
+        .detalle(mapDeudas(deudas))
         .build();
   }
 
-  private List<DetalleDeuda> mapDeudas(List<Deuda> deudas, List<Pago> pagos) {
+  private List<DetalleDeuda> mapDeudas(List<Deuda> deudas) {
     List<DetalleDeuda> result = new ArrayList<>();
     for (Deuda deuda : deudas) {
       result.add(
           DetalleDeuda.builder()
               .deudaId(deuda.getId())
               .montoDeuda(deuda.getMontoDeuda().doubleValue())
-              .montoPagos(getPagoPorDeuda(deuda.getId(), pagos))
+              .saldo(deuda.getSaldo().doubleValue())
               .build());
     }
 
     return result;
-  }
-
-  private Double getPagoPorDeuda(Long id, List<Pago> pagos) {
-    return pagos.stream()
-        .filter(pago -> Objects.equals(pago.getDeuda().getId(), id))
-        .map(Pago::getMontoPago)
-        .reduce(BigDecimal.ZERO, BigDecimal::add)
-        .doubleValue();
   }
 }
