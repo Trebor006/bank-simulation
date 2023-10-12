@@ -17,21 +17,24 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("deudas")
 public class DeudasController {
 
-  @Autowired
-  private DeudaService service;
+  @Autowired private DeudaService service;
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public ResponseEntity<Void> registrarDeuda(@RequestBody DeudaRequestDto registrarDeuda) {
+  public ResponseEntity<Void> registrarDeuda(
+      @RequestHeader("uuid") String uuid, @RequestBody DeudaRequestDto registrarDeuda) {
 
+    log.info("uuid :" + uuid);
     service.registrarDeuda(registrarDeuda);
 
     return ResponseEntity.ok().build();
   }
 
   @GetMapping("/byUser/{identificacion}")
-  public ResponseEntity<DetalleDeudaDto> obtenerDeudasPorCliente(@PathVariable String identificacion) {
-    log.info("identificacion :: " + identificacion);
+  public ResponseEntity<DetalleDeudaDto> obtenerDeudasPorCliente(
+      @RequestHeader("uuid") String uuid, @PathVariable String identificacion) {
+
+    log.info("uuid :" + uuid + ", identificacion :: " + identificacion);
 
     DetalleDeudaDto detalleDeudaDto = service.obtenerDeudasPorCliente(identificacion);
 

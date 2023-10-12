@@ -28,4 +28,7 @@ public class Pago {
 
   @Column(name = "monto_pago", nullable = false)
   private BigDecimal montoPago;
+
+  @Column(name = "uuid", nullable = false)
+  private String uuid;
 }
