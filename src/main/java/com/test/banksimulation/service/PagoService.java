@@ -17,19 +17,22 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class PagoService {
 
-  @Autowired private DeudaRepository deudaRepository;
-  @Autowired private PagoRepository pagoRepository;
+  private final DeudaRepository deudaRepository;
+  private final PagoRepository pagoRepository;
 
-  @Transactional
-  public Optional<DetallePagoResponse> registrarPago(PagoDto pagoDto, String uuid) {
+  @Autowired RestTemplate restTemplate;
+
+  public Optional<DetallePagoResponse> procesarPago(PagoDto pagoDto, String uuid) {
     Optional<Pago> pagoStored = pagoRepository.findByUuid(uuid);
     if (pagoStored.isPresent()) {
       return responseDetallePago(pagoStored.get());
@@ -41,8 +44,8 @@ public class PagoService {
 
       BigDecimal montoPago =
           BigDecimal.valueOf(pagoDto.getMonto()).setScale(2, RoundingMode.HALF_UP);
-      Pago pago = Pago.builder().deuda(deuda).fechaPago(new Date()).montoPago(montoPago)
-              .uuid(uuid).build();
+      Pago pago =
+          Pago.builder().deuda(deuda).fechaPago(new Date()).montoPago(montoPago).uuid(uuid).build();
 
       pagoRepository.save(pago);
 
@@ -55,26 +58,40 @@ public class PagoService {
 
       log.info(
           "Deuda Actualizada " + deuda.getStatus() + ": saldo : " + deuda.getSaldo().doubleValue());
-      return responseDetallePago(pago);
+      return responseDetallePago(pago, deuda);
     }
 
     return Optional.empty();
   }
 
   private Optional<DetallePagoResponse> responseDetallePago(Pago pago) {
-    return Optional.of(DetallePagoResponse.builder()
-                    .pagoId(pago.getId())
-                    .uuid(pago.getUuid())
-                    .monto(pago.getMontoPago())
-                    .detalleDeuda(responseDetalleDeuda(pago.getDeuda()))
+    return responseDetallePago(pago, pago.getDeuda());
+  }
+
+  private Optional<DetallePagoResponse> responseDetallePago(Pago pago, Deuda deuda) {
+    return Optional.of(
+        DetallePagoResponse.builder()
+            .pagoId(pago.getId())
+            .uuid(pago.getUuid())
+            .monto(pago.getMontoPago())
+            .detalleDeuda(responseDetalleDeuda(deuda))
             .build());
   }
 
   private DetallePagoDeudaResponse responseDetalleDeuda(Deuda deuda) {
     return DetallePagoDeudaResponse.builder()
-            .deudaId(deuda.getId())
-            .monto(deuda.getMontoDeuda())
-            .saldo(deuda.getSaldo())
-            .build();
+        .deudaId(deuda.getId())
+        .monto(deuda.getMontoDeuda())
+        .saldo(deuda.getSaldo())
+        .build();
+  }
+
+  public void notifyPayment(
+      String notificationUri, String uuid, DetallePagoResponse detallePagoResponse) {
+    log.info("notifyPayment.........");
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("uuid", uuid);
+    HttpEntity<DetallePagoResponse> entity = new HttpEntity<>(detallePagoResponse, headers);
+    restTemplate.postForObject(notificationUri, entity, Void.class);
   }
 }
